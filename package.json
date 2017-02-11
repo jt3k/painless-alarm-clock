@@ -1,7 +1,7 @@
 {
   "name": "painless-alarm-clock",
   "version": "0.0.0",
-  "description": "My badass module",
+  "description": "Alarm clock with fade-in function",
   "license": "MIT",
   "repository": "jt3k/painless-alarm-clock",
   "author": {
