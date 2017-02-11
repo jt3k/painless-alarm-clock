@@ -1,5 +1,5 @@
 # painless-alarm-clock
 The radio is playing smoothly increasing the volume
 
-![](./illustration.svg)
+![illustration](https://rawgit.com/jt3k/painless-alarm-clock/master/illustration.svg)
 
