@@ -4,17 +4,11 @@ var meow = require('meow');
 var painlessAlarmClock = require('./');
 
 var cli = meow([
-	'Usage',
-	'  $ painless-alarm-clock [input]',
-	'',
-	'Options',
-	'  --foo  Lorem ipsum. [Default: false]',
-	'',
-	'Examples',
-	'  $ painless-alarm-clock',
-	'  unicorns & rainbows',
-	'  $ painless-alarm-clock ponies',
-	'  ponies & rainbows'
+  'Usage',
+  '  $ painless-alarm-clock <START_TIME> <END_TIME>',
+  '',
+  'Example',
+  '  $ painless-alarm-clock 05:00:00 10:00:00',
 ]);
 
-console.log(painlessAlarmClock(cli.input[0] || 'unicorns'));
+console.log(painlessAlarmClock(cli.input[0], cli.input[1]));

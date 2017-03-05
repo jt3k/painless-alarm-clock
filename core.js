@@ -7,6 +7,8 @@ const {
   convertTimeToSecondsSinceMidnignt
 } = require('./lib');
 
+const player = require('./player');
+
 const NOW = new Date();
 const RAW_START_TIME = new Date(Number(NOW) + 1000).toLocaleTimeString();
 const RAW_END_TIME = new Date(Number(NOW) + 60000).toLocaleTimeString();
@@ -15,23 +17,31 @@ const easing = new BezierEasing(1.00, 0.00, 0.50, 1.00);
 
 bus.on('UPDATE', console.log.bind(console));
 
+let curVolumeLevel = 0;
 bus.on('UPDATE', ({alarmStatus}) => {
-  const volumeLevel = easing(alarmStatus);
-  if (alarmStatus) {
+  const volumeLevel = Number(easing(alarmStatus).toFixed(3));
+  if (alarmStatus && curVolumeLevel !== volumeLevel) {
+    console.log('volumeLevel', volumeLevel);
     vol.set(volumeLevel, () => {});
+    curVolumeLevel = volumeLevel;
   }
 });
 
-setInterval(() => {
-  const now = (new Date()).toLocaleTimeString();
+function painlessAlarmClock(START = RAW_START_TIME, END = RAW_END_TIME) {
+  player();
+  console.log('arguments', arguments);
+  setInterval(() => {
+    const NOW = (new Date()).toLocaleTimeString();
+    const startInSec = convertTimeToSecondsSinceMidnignt(START);
+    const nowInSec = convertTimeToSecondsSinceMidnignt(NOW);
+    const endInSec = convertTimeToSecondsSinceMidnignt(END);
 
-  const startInSec = convertTimeToSecondsSinceMidnignt(RAW_START_TIME); // A
-  const nowInSec = convertTimeToSecondsSinceMidnignt(now); // B
-  const endInSec = convertTimeToSecondsSinceMidnignt(RAW_END_TIME); // C
+    const alarmStatus = calculateSegmentsLengthRatio(startInSec, nowInSec, endInSec);
 
-  const alarmStatus = calculateSegmentsLengthRatio(startInSec, nowInSec, endInSec);
+    bus.emit('UPDATE', {
+      alarmStatus
+    });
+  }, 1000);
+}
 
-  bus.emit('UPDATE', {
-    alarmStatus
-  });
-}, 500);
+module.exports = painlessAlarmClock;
