@@ -1,3 +1,5 @@
+var say = require('say');
+
 const lib = require('./lib');
 
 const {
@@ -56,21 +58,15 @@ function startEndlesPlaying() {
 // play('http://somafm.com/cliqhop32.pls');
 // play('http://somafm.com/groovesalad32.pls');
 
-function say(message, callback = () => {}) {
-  const args = [message];
-  const proc = spawn('say', args);
-  proc.on('close', callback);
-  return proc;
-}
-
 const stdin = process.stdin;
 stdin.setRawMode(true);
 stdin.resume();
 stdin.setEncoding('utf-8');
 
-function sayTime(callback = () => {}) {
+function sayTime() {
+  say.stop();
   const timeString = (new Date()).toLocaleTimeString().replace(/\d+$/, '');
-  say(timeString, callback);
+  say.speak(timeString, 'Milena');
 }
 
 stdin.on('data', key => {
