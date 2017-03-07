@@ -3,10 +3,13 @@ var say = require('say');
 const lib = require('./lib');
 
 const {
-  spawn,
-  kill,
-  killall
-} = lib.procM;
+  procM: {
+    spawn,
+    kill,
+    killall
+  },
+  bus
+} = lib;
 
 function play(playlist) {
   const args = [
@@ -21,15 +24,14 @@ function play(playlist) {
 
 function startEndlesPlaying() {
   let proc = play('http://somafm.com/beatblender32.pls');
-  proc._isPlaying = false;
+  bus.emit('PLAYER', 'pending');
 
   proc.stdout.on('data', function (data) {
     data = data.toString();
 
-    console.log('stdout: ' + data);
+    // console.log('stdout: ' + data);
     if (/\[coreaudio\]/.test(data)) {
-      proc._isPlaying = true;
-      console.log('isPlaying = true;');
+      bus.emit('PLAYER', 'playing');
     }
   });
   proc.stderr.on('data', function (err) {
@@ -37,21 +39,23 @@ function startEndlesPlaying() {
     // console.log('stderr: ' + err);
 
     if (/\[performance issue\]/.test(err)) {
-      proc._isPlaying = false;
-      console.log('isPlaying = false;');
+      bus.emit('PLAYER', 'stoped');
     }
   });
 
   proc.on('close', function (code) {
     console.log('CLOSING CODE: ' + code);
-    proc._isPlaying = false;
-    console.log('isPlaying = false;');
+    bus.emit('PLAYER', 'stoped');
     sayTime();
-    startEndlesPlaying();
+    proc = startEndlesPlaying();
   });
 
   return proc;
 }
+
+bus.on('PLAYER', function () {
+  console.log('arguments', arguments);
+});
 
 // startEndlesPlaying();
 
