@@ -8,7 +8,7 @@ var cli = meow([
   '  $ painless-alarm-clock <START_TIME> <END_TIME>',
   '',
   'Example',
-  '  $ painless-alarm-clock 05:00:00 10:00:00',
+  '  $ painless-alarm-clock 05:00:00 10:00:00'
 ]);
 
 console.log(painlessAlarmClock(cli.input[0], cli.input[1]));
