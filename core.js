@@ -15,13 +15,15 @@ const RAW_END_TIME = new Date(Number(NOW) + 60000).toLocaleTimeString();
 
 const easing = new BezierEasing(1.00, 0.00, 0.50, 1.00);
 
-bus.on('UPDATE', console.log.bind(console));
-
 let curVolumeLevel = 0;
 bus.on('UPDATE', ({alarmStatus}) => {
   const volumeLevel = Number(easing(alarmStatus).toFixed(3));
   if (alarmStatus && curVolumeLevel !== volumeLevel) {
-    console.log('volumeLevel', volumeLevel);
+    console.log({
+      volumeLevel: volumeLevel.toFixed(4),
+      alarmStatus: alarmStatus.toFixed(4)
+    });
+
     vol.set(volumeLevel, () => {});
     curVolumeLevel = volumeLevel;
   }
