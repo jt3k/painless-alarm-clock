@@ -13,7 +13,7 @@ const NOW = new Date();
 const RAW_START_TIME = new Date(Number(NOW) + 1000).toLocaleTimeString();
 const RAW_END_TIME = new Date(Number(NOW) + 60000).toLocaleTimeString();
 
-const easing = new BezierEasing(1.00, 0.00, 0.50, 1.00);
+const easing = new BezierEasing(1.0, 1.0, 1.0, 0.3);
 
 let curVolumeLevel = 0;
 bus.on('UPDATE', ({alarmStatus}) => {
