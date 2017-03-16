@@ -1,6 +1,7 @@
 # painless-alarm-clock [![Build Status](https://travis-ci.org/jt3k/painless-alarm-clock.svg?branch=master)](https://travis-ci.org/jt3k/painless-alarm-clock)
 
 > Alarm clock with fade-in function
+> *It's currently not in a usable state.*
 
 ![illustration](https://rawgit.com/jt3k/painless-alarm-clock/master/illustration.svg)
 
