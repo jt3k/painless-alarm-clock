@@ -4,7 +4,7 @@
 
 > *It's currently not in a usable state.*
 
-![illustration](https://rawgit.com/jt3k/painless-alarm-clock/master/illustration.svg)
+![illustration](./illustration.svg)
 
 ## Install
 
