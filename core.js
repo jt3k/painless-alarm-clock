@@ -7,18 +7,30 @@ const {
   convertTimeToSecondsSinceMidnignt
 } = require('./lib');
 
-const player = require('./player');
-
-const NOW = new Date();
-const RAW_START_TIME = new Date(Number(NOW) + 1000).toLocaleTimeString();
-const RAW_END_TIME = new Date(Number(NOW) + 60000).toLocaleTimeString();
+const {
+  startEndlesPlaying,
+  stopEndlessPlaying,
+  sayTime
+} = require('./player');
 
 const easing = new BezierEasing(1.0, 1.0, 1.0, 0.3);
 
 let curVolumeLevel = 0;
+let lastTimeSay = 0;
+const volSayCorrection = 1;
+
 bus.on('UPDATE', ({alarmStatus}) => {
-  const volumeLevel = Number(easing(alarmStatus).toFixed(3));
-  if (alarmStatus && curVolumeLevel !== volumeLevel) {
+  const isAlarm = alarmStatus !== false;
+  if (isAlarm) {
+    startEndlesPlaying();
+  } else {
+    stopEndlessPlaying();
+  }
+
+  console.log('isAlarm', isAlarm);
+
+  const volumeLevel = Number(easing(alarmStatus).toFixed(3)) * volSayCorrection;
+  if (alarmStatus !== false && curVolumeLevel !== volumeLevel) {
     console.log({
       volumeLevel: volumeLevel.toFixed(4),
       alarmStatus: alarmStatus.toFixed(4)
@@ -26,12 +38,23 @@ bus.on('UPDATE', ({alarmStatus}) => {
 
     vol.set(volumeLevel, () => {});
     curVolumeLevel = volumeLevel;
+
+    // /////////////////////////////////////
+    // in half phase say time each 8 min //
+    // /////////////////////////////////////
+    const sayRate = 8 * 60 * 1000;  // 8 min
+    const isTimeToSayTime = alarmStatus >= 0.5;
+    // one say per 8 min
+    const allowedToSay = (Date.now() - lastTimeSay) > sayRate;
+    if (allowedToSay && isTimeToSayTime) {
+      // setTimeout();
+      lastTimeSay = Date.now();
+      sayTime();
+    }
   }
 });
 
-function painlessAlarmClock(START = RAW_START_TIME, END = RAW_END_TIME) {
-  player();
-  console.log('arguments', arguments);
+function painlessAlarmClock(START, END) {
   setInterval(() => {
     const NOW = (new Date()).toLocaleTimeString();
     const startInSec = convertTimeToSecondsSinceMidnignt(START);

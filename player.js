@@ -1,4 +1,4 @@
-var say = require('say');
+const say = require('say');
 
 const lib = require('./lib');
 
@@ -21,12 +21,18 @@ function play(playlist) {
 
   return spawn('mplayer', args);
 }
+let plzStopPlaying = false;
+let curStatus = 'stoped';
 
 function startEndlesPlaying() {
+  if (curStatus !== 'stoped') {
+    return;
+  }
+
   let proc = play('http://somafm.com/beatblender32.pls');
   bus.emit('PLAYER', 'pending');
 
-  proc.stdout.on('data', function (data) {
+  proc.stdout.on('data', data => {
     data = data.toString();
 
     // console.log('stdout: ' + data);
@@ -34,7 +40,7 @@ function startEndlesPlaying() {
       bus.emit('PLAYER', 'playing');
     }
   });
-  proc.stderr.on('data', function (err) {
+  proc.stderr.on('data', err => {
     err = err.toString();
     // console.log('stderr: ' + err);
 
@@ -43,18 +49,29 @@ function startEndlesPlaying() {
     }
   });
 
-  proc.on('close', function (code) {
-    console.log('CLOSING CODE: ' + code);
+  proc.on('close', code => {
+    console.log(`CLOSING CODE: ${code}`);
     bus.emit('PLAYER', 'stoped');
     sayTime();
+    if (plzStopPlaying) {
+      plzStopPlaying = false;
+      return;
+    }
+
     proc = startEndlesPlaying();
   });
 
   return proc;
 }
 
-bus.on('PLAYER', function () {
-  console.log('arguments', arguments);
+function stopEndlessPlaying() {
+  plzStopPlaying = true;
+  killall();
+}
+
+bus.on('PLAYER', status => {
+  console.log('status', status);
+  curStatus = status;
 });
 
 // startEndlesPlaying();
@@ -70,7 +87,7 @@ stdin.setEncoding('utf-8');
 function sayTime() {
   say.stop();
   const timeString = (new Date()).toLocaleTimeString().replace(/\d+$/, '');
-  say.speak(timeString, 'Milena');
+  say.speak(timeString, 'Milena', 0.25);
 }
 
 stdin.on('data', key => {
@@ -88,7 +105,11 @@ stdin.on('data', key => {
   }
 });
 
-module.exports = startEndlesPlaying;
+module.exports = {
+  startEndlesPlaying,
+  stopEndlessPlaying,
+  sayTime
+};
 // module.exports = function (str, opts) {
 // 	if (typeof str !== 'string') {
 // 		throw new TypeError('Expected a string');
